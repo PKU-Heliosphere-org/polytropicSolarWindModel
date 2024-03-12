@@ -1,0 +1,8 @@
+name: polytropicSolarWindModel
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - scipy
+  - streamlit
