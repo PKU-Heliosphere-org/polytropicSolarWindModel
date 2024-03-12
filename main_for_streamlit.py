@@ -132,7 +132,7 @@ if __name__ == '__main__':
     args = [np.sqrt(V02), 1/C0_Cg, gamma]
     # x0 = [1., np.sqrt(V02)]
     # ts = np.linspace(0., s_c[s_c_i]-1., 16001)
-    x0 = -eps * dx([s_c[s_c_i] - eps, np.sqrt(Vc2)], 0, args) + [s_c[s_c_i], np.sqrt(Vc2)]
+    x0 = -eps * dx([s_c[s_c_i] - eps, np.sqrt(Vc2)], 0, args)/2 -eps * dx([s_c[s_c_i] + eps, np.sqrt(Vc2)], 0, args)/2 + [s_c[s_c_i], np.sqrt(Vc2)]
     ts = np.linspace(x0[0] - 1., 0., 801)
     sol1 = rkdumb(x0, ts, dx, args=args)
     x0 = eps * dx(sol1[1, :], 0, args) + [s_c[s_c_i], np.sqrt(Vc2)]
