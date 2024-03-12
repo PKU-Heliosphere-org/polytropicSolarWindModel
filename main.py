@@ -34,6 +34,17 @@ def solve_s_c(C0_Cg, gamma):
         statu=None
     return s_c,statu
 
+def solve_V(s_c, Vc, s, args):
+    V0, Cg, gamma = args
+    # solve s from \frac{1}{2}\left(V^{2}-V_{c}^{2}\right)=-\frac{V_{c}^{2}}{\gamma-1}\left[\left(\frac{V_{c} s_{c}^{2}}{V s^{2}}\right)^{\gamma-1}-1\right]+2 C_{g}^{2}\left(\frac{1}{s}-\frac{1}{s_{c}}\right),
+    # where V is the solar wind velocity, Vc is the sound speed at the critical point, s is the solar centric distance, s_c is the critical point distance, Cg is the gravitational speed
+    # Vc is the sound speed at the critical point
+
+    # solve the equation
+    func = lambda V: 1/2*(V**2-Vc**2)+Vc**2/(gamma-1)*((Vc*s_c**2/V/s**2)**(gamma-1)-1)-2*Cg**2*(1/s-1/s_c)
+    V = fsolve(func, Vc)
+    return V
+
 def dx(x,t,args):
     '''
     x=V
@@ -115,13 +126,17 @@ if __name__ == '__main__':
     eps = 1e-3
     V02 = C0_Cg**(-2-4/(gamma-1))*s_c[s_c_i]**((3*gamma-5)/(gamma-1)) # actually V0/C0
     Vc2 = C0_Cg**(-2)/s_c[s_c_i];
+    Vc = np.sqrt(Vc2)
     args = [np.sqrt(V02), 1/C0_Cg, gamma]
-    # x0 = [1., np.sqrt(V02)]
-    x0 = -eps * dx([s_c[s_c_i]-eps, np.sqrt(Vc2)], 0, args) + [s_c[s_c_i], np.sqrt(Vc2)]
+
+    V_l = solve_V(s_c[s_c_i], Vc, s_c[s_c_i] - eps, args)
+    V_r = solve_V(s_c[s_c_i], Vc, s_c[s_c_i] + eps, args)
+    x0 = np.array([s_c[s_c_i] - eps, V_l[0]])
     ts = np.linspace(x0[0]-1., 0., 801)
     sol1 = rkdumb(x0, ts, dx, args=args)
 
-    x0 = eps * dx(sol1[1, :], 0, args) + [s_c[s_c_i], np.sqrt(Vc2)]
+    # x0 = eps * dx(sol1[1, :], 0, args) + [s_c[s_c_i], np.sqrt(Vc2)]
+    x0 = np.array([s_c[s_c_i] + eps, V_r[0]])
     ts = np.linspace(x0[0]-1, 100, 4001)
     sol2 = rkdumb(x0, ts, dx, args=args)
     sol = np.append(sol1[::-1, :], sol2, axis=0)
