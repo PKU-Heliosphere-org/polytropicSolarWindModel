@@ -1,6 +1,6 @@
 # Evolution Model of Solar Wind Velocity in PolyTropic System
 
-from scipy.optimize import fsolve
+# from scipy.optimize import fsolve
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
